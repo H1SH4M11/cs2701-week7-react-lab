@@ -1,8 +1,8 @@
-import React from 'react'; // We still need to import React itself
+import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route, Link, Outlet } from 'react-router-dom';
 
-// --- Header Component ---
-// I've moved the Header component from its own file into this one.
-// It receives "props" (imgSrc, alt) from the App component below.
+// --- 1. Existing Components (Header & Sidebar) ---
+
 function Header({ imgSrc, alt }) {
   return (
     <header>
@@ -20,8 +20,6 @@ function Header({ imgSrc, alt }) {
   );
 }
 
-// --- Sidebar Component ---
-// I've moved the Sidebar component here as well.
 function Sidebar() {
   return (
     <aside>
@@ -37,118 +35,174 @@ function Sidebar() {
   );
 }
 
-// --- RegistrationForm Component ---
-// This is the form component, also moved here.
-// It contains the handleSubmit logic for the Challenge Activity.
+// --- 2. The New "Controlled" Registration Form ---
+
 function RegistrationForm() {
-  
-  // This function runs when the form is submitted
-  function handleSubmit(e) {
-    // 1. Stop the page from refreshing
+  // State variables to hold form data (The "Controlled" part)
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    repPassword: '',
+    buyer: false,
+    seller: false,
+    tos: false
+  });
+
+  // Handle input changes
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  // Handle form submission
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    // 2. Create a FormData object from the form
-    const formData = new FormData(e.target);
-
-    // 3. Extract the name and email values
-    const name = formData.get("name");
-    const email = formData.get("email");
-
-    // 4. Display them in an alert
-    alert(`Submitted: ${name} — ${email}`);
-  }
+    alert(`Submitted:\nName: ${formData.name}\nEmail: ${formData.email}`);
+  };
 
   return (
     <section>
-      {/* The form's onSubmit event is linked to the handleSubmit function 
-      */}
+      <h2>Register</h2>
       <form className="center" noValidate onSubmit={handleSubmit}>
-        {/* Note: In JSX, 'class' becomes 'className' and 'for' becomes 'htmlFor'
-        */}
-        <label className="textInput" htmlFor="name">
-          Name:
-        </label>
-        <input type="text" id="name" name="name" required maxLength="50" />
-        <br />
-        <br />
-
-        <label className="textInput" htmlFor="email">
-          Email:
-        </label>
-        <input type="email" id="email" name="email" required />
-        <br />
-        <br />
-
-        <label className="textInput" htmlFor="password">
-          Password:
-        </label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          required
-          minLength="8"
+        <label className="textInput" htmlFor="name">Name:</label>
+        <input 
+          type="text" 
+          id="name" 
+          name="name" 
+          value={formData.name} 
+          onChange={handleChange} 
+          required maxLength="50" 
         />
-        <br />
-        <br />
+        <br /><br />
 
-        <label className="textInput" htmlFor="repPassword">
-          Re-type password:
-        </label>
-        <input
-          type="password"
-          id="repPassword"
-          name="repPassword"
-          required
-          minLength="8"
+        <label className="textInput" htmlFor="email">Email:</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          value={formData.email} 
+          onChange={handleChange} 
+          required 
         />
-        <br />
+        <br /><br />
+
+        <label className="textInput" htmlFor="password">Password:</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          value={formData.password} 
+          onChange={handleChange} 
+          required minLength="8" 
+        />
+        <br /><br />
+
+        <label className="textInput" htmlFor="repPassword">Re-type password:</label>
+        <input 
+          type="password" 
+          id="repPassword" 
+          name="repPassword" 
+          value={formData.repPassword} 
+          onChange={handleChange} 
+          required minLength="8" 
+        />
+        <br /><br />
+
+        <input 
+          type="checkbox" 
+          id="buyer" 
+          name="buyer" 
+          checked={formData.buyer} 
+          onChange={handleChange} 
+        />
+        <label htmlFor="buyer">I want to buy produce.</label>
         <br />
 
-        <input type="checkbox" id="buyer" name="buyer" value="buyer" />
-        <label htmlFor="buyer">
-          I want to buy produce directly from allotment owners.
-        </label>
-        <br />
-        <input type="checkbox" id="seller" name="seller" value="seller" />
-        <label htmlFor="seller">I want to sell produce from my allotment.</label>
-        <br />
-        <br />
+        <input 
+          type="checkbox" 
+          id="seller" 
+          name="seller" 
+          checked={formData.seller} 
+          onChange={handleChange} 
+        />
+        <label htmlFor="seller">I want to sell produce.</label>
+        <br /><br />
 
-        <input type="checkbox" id="tos" name="tos" value="tos" required />
-        <label htmlFor="tos">
-          I agree to the <a href="">Terms of Use</a> and{" "}
-          <a href="">Privacy Policy</a>.
-        </label>
-        <br />
-        <br />
+        <input 
+          type="checkbox" 
+          id="tos" 
+          name="tos" 
+          checked={formData.tos} 
+          onChange={handleChange} 
+          required 
+        />
+        <label htmlFor="tos">I agree to Terms & Privacy Policy.</label>
+        <br /><br />
 
         <button type="submit">Register</button>
-        <a href="">Learn more</a>
       </form>
     </section>
   );
 }
 
+// --- 3. Simple Placeholder Pages ---
 
-// --- Main App Component ---
-// This is your main App component. It assembles all the
-// other components (defined above) to build the page.
-function App() {
+function Home() {
+  return <section><h2>Welcome Home</h2><p>This is the home page.</p></section>;
+}
+
+function Login() {
+  return <section><h2>Login</h2><p>Login form goes here.</p></section>;
+}
+
+function Help() {
+  return <section><h2>Help</h2><p>How can we help you?</p></section>;
+}
+
+// --- 4. Layout Component (The frame for every page) ---
+
+function Layout() {
   return (
-    // We use a React "Fragment" (empty brackets) to wrap our components
     <>
-      {/* We pass the image path and alt text as "props" to our Header component.
-        This completes Activity 2's "Using Props" task.
-      */}
       <Header imgSrc="/SharingFood.jpg" alt="Hands holding tomatoes" />
-
-      <main>
-        {/* The Sidebar and RegistrationForm components are nested in main */}
+      {/* The Navigation Menu */}
+      <nav style={{ backgroundColor: '#333', padding: '10px' }}>
+        <ul className="navlist" style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', gap: '20px' }}>
+          <li><Link to="/" style={{ color: 'white', textDecoration: 'none' }}>Home</Link></li>
+          <li><Link to="/register" style={{ color: 'white', textDecoration: 'none' }}>Register</Link></li>
+          <li><Link to="/login" style={{ color: 'white', textDecoration: 'none' }}>Login</Link></li>
+          <li><Link to="/help" style={{ color: 'white', textDecoration: 'none' }}>Help</Link></li>
+        </ul>
+      </nav>
+      <main style={{ display: 'flex', marginTop: '20px' }}>
         <Sidebar />
-        <RegistrationForm />
+        {/* Outlet renders the child route's component (Home, Register, etc.) */}
+        <div style={{ width: '75%', padding: '20px' }}>
+          <Outlet />
+        </div>
       </main>
     </>
+  );
+}
+
+// --- 5. Main App Component with Router ---
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="register" element={<RegistrationForm />} />
+          <Route path="login" element={<Login />} />
+          <Route path="help" element={<Help />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
